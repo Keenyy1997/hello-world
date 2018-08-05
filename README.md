@@ -1,4 +1,3 @@
-# hello-world
-Kenny Sample Repository
+# Testing repository
 
-
+**by Kenny Vallejo at 2018/08/05 02:53 PM**
