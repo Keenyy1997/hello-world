@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Hello world!</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="main.css">
+	<script src="/socket.io/socket.io.js"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+</head>
+<script>
+	var socket = io();
+
+	socket.on('chat-message',function(json)
+	{
+		var MessageParsed = JSON.parse(json);
+		console.log(MessageParsed);
+		if(MessageParsed)
+		{
+			var Elem = document.createElement('div')
+
+			if(MessageParsed.User == document.getElementById('f_input1').value)
+				Elem.classList.add('OwnMessage')
+			else
+				Elem.classList.add('Received')
+
+			var ElemUser = document.createElement('b')
+				ElemUser.innerHTML = MessageParsed.User
+
+			var ElemDate = document.createElement('small')
+				ElemDate.innerHTML = MessageParsed.Date
+
+				ElemUser.appendChild(ElemDate);
+
+			var ElemMsg = document.createElement('p')
+				ElemMsg.innerHTML = MessageParsed.Msg
+
+			Elem.appendChild(ElemUser)
+			Elem.appendChild(ElemMsg)
+
+			var Container = document.getElementById('msg_container')
+
+			Container.appendChild(Elem)
+
+			Container.scrollTop = Container.scrollHeight;
+		}
+	});
+
+	function SendMessage()
+	{
+		var User 	= document.getElementById('f_input1')
+		var Mensaje = document.getElementById('f_input2')
+
+		if(!User.value)
+		{
+			alert("Campo Usuario, Requerido.");
+			return;
+		}
+		if(!Mensaje.value)
+		{
+			alert('Campo Mensaje, Requerido.');
+			return;
+		}
+			var DateNow = new Date()
+				DateNow = DateNow.getFullYear()+"-"+(DateNow.getMonth()-1)+"-"+DateNow.getDate()+" "+DateNow.getHours()+":"+DateNow.getMinutes()+":"+DateNow.getSeconds();
+
+			var datarow = {
+				"User"	: User.value,
+				"Msg"	: Mensaje.value,
+				"Date"	: DateNow
+			};
+
+			socket.emit('chat-message',JSON.stringify(datarow));
+
+			Mensaje.value = ""
+	}
+
+
+
+</script>
+<body>
+	<div class="container">
+		<nav class="navbar navbar-dark bg-dark">
+		  <p style='font-size:25px;color:#fff;'>Chat Room</p>
+		</nav>
+		<form class="form-inline" onsubmit="event.preventDefault();SendMessage();">
+			<div class="form-group col-4">
+				<label for='f_input1'>Usuario</label>
+				<input type='text' id='f_input1' class="form-control col-12" required/>
+			</div>
+			<div class="form-group col-6">
+				<label for='f_input1'>Mensaje</label>
+				<input type='text' id='f_input2' class="form-control col-12" required/>
+			</div>
+			<button type='submit' class="btn btn-primary col-2" style='margin-top:20px;'>
+				Enviar
+			</button>
+		</form>
+
+		<div class="container" id='msg_container' style='margin:6px auto;'	>
+			
+		</div>
+	</div>
+</body>
+</html>
